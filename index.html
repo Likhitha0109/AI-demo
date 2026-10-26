@@ -1,0 +1,327 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlowShop - Shopping App</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #f5f3ff, #e0f2fe);
+  color: #222;
+  min-height: 100vh;
+}
+
+header {
+  padding: 22px 7%;
+  background: linear-gradient(120deg, #6d28d9, #ec4899);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo {
+  font-size: 27px;
+  font-weight: bold;
+}
+
+.cart {
+  background: white;
+  color: #7c3aed;
+  border: none;
+  padding: 11px 18px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.hero {
+  padding: 45px 7%;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: clamp(30px, 5vw, 48px);
+  margin-bottom: 12px;
+  background: linear-gradient(90deg, #7c3aed, #ec4899);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.hero p {
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.search {
+  width: min(100%, 450px);
+  padding: 14px 18px;
+  border: 1px solid #ddd6fe;
+  border-radius: 30px;
+  outline: none;
+  font-size: 16px;
+}
+
+.search:focus {
+  border-color: #8b5cf6;
+}
+
+.section-title {
+  padding: 0 7%;
+  margin-bottom: 22px;
+}
+
+.products {
+  padding: 0 7% 50px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: rgba(255,255,255,0.9);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px #6d28d911;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 30px #6d28d922;
+}
+
+.product-image {
+  height: 180px;
+  display: grid;
+  place-items: center;
+  font-size: 75px;
+  background: linear-gradient(135deg, #ddd6fe, #fbcfe8);
+}
+
+.card:nth-child(3n+2) .product-image {
+  background: linear-gradient(135deg, #bfdbfe, #c4b5fd);
+}
+
+.card:nth-child(3n) .product-image {
+  background: linear-gradient(135deg, #fde68a, #fbcfe8);
+}
+
+.details {
+  padding: 18px;
+}
+
+.details h3 {
+  margin-bottom: 8px;
+}
+
+.details p {
+  color: #777;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.price {
+  font-size: 19px;
+  font-weight: bold;
+  color: #7c3aed;
+}
+
+.add-btn {
+  border: none;
+  color: white;
+  background: linear-gradient(120deg, #7c3aed, #ec4899);
+  padding: 10px 13px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.add-btn:hover {
+  opacity: 0.85;
+}
+
+footer {
+  text-align: center;
+  padding: 25px;
+  background: #312e81;
+  color: white;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 35px;
+  color: #666;
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 18px 5%;
+  }
+  .hero {
+    padding: 35px 5%;
+  }
+  .products {
+    padding: 0 5% 35px;
+    gap: 15px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .product-image {
+    height: 135px;
+    font-size: 55px;
+  }
+  .details {
+    padding: 12px;
+  }
+  .details h3 {
+    font-size: 15px;
+  }
+  .price-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">✨ GlowShop</div>
+  <button class="cart" onclick="showCart()">
+    🛒 Cart (<span id="cart-count">0</span>)
+  </button>
+</header>
+
+<section class="hero">
+  <h1>Discover Your Style</h1>
+  <p>Find your favorite products at amazing prices.</p>
+  <input
+    class="search"
+    id="search"
+    type="search"
+    placeholder="🔍 Search products..."
+    oninput="renderProducts()"
+  >
+</section>
+
+<h2 class="section-title">🔥 Featured Products</h2>
+
+<main class="products" id="products"></main>
+
+<footer>
+  <p>© 2026 GlowShop | Made with 💜</p>
+</footer>
+
+<script>
+const items = [
+  { id: 1, name: "Headphones", price: 1499, emoji: "🎧", desc: "Premium sound quality" },
+  { id: 2, name: "Smart Watch", price: 2499, emoji: "⌚", desc: "Style meets technology" },
+  { id: 3, name: "Sneakers", price: 1999, emoji: "👟", desc: "Comfort for every step" },
+  { id: 4, name: "Backpack", price: 999, emoji: "🎒", desc: "Carry your world" },
+  { id: 5, name: "Camera", price: 4999, emoji: "📷", desc: "Capture every moment" },
+  { id: 6, name: "Sunglasses", price: 799, emoji: "🕶️", desc: "Look cool every day" }
+];
+
+let cart = [];
+
+function renderProducts() {
+  const search = document.getElementById("search")
+    .value.toLowerCase();
+
+  const filtered = items.filter(item =>
+    item.name.toLowerCase().includes(search)
+  );
+
+  const container = document.getElementById("products");
+
+  if (filtered.length === 0) {
+    container.innerHTML =
+      '<p class="empty">No products found. Try another search!</p>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(item => `
+    <article class="card">
+      <div class="product-image">${item.emoji}</div>
+      <div class="details">
+        <h3>${item.name}</h3>
+        <p>${item.desc}</p>
+        <div class="price-row">
+          <span class="price">₹${item.price.toLocaleString("en-IN")}</span>
+          <button class="add-btn" onclick="addToCart(${item.id})">
+            + Add
+          </button>
+        </div>
+      </div>
+    </article>
+  `).join("");
+}
+
+function addToCart(id) {
+  const product = items.find(item => item.id === id);
+  const existing = cart.find(item => item.id === id);
+
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cart.push({ ...product, quantity: 1 });
+  }
+
+  updateCartCount();
+}
+
+function updateCartCount() {
+  const count = cart.reduce(
+    (total, item) => total + item.quantity, 0
+  );
+  document.getElementById("cart-count").textContent = count;
+}
+
+function showCart() {
+  if (cart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  const contents = cart.map(item =>
+    `${item.name} x ${item.quantity} = ₹${item.price * item.quantity}`
+  ).join("\n");
+
+  const total = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity, 0
+  );
+
+  alert(
+    "🛒 YOUR CART\n\n" + contents +
+    "\n\nTotal: ₹" + total.toLocaleString("en-IN") +
+    "\n\nThank you for shopping!"
+  );
+}
+
+renderProducts();
+</script>
+
+</body>
+</html>
+
